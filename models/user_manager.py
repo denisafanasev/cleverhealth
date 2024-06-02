@@ -590,7 +590,7 @@ class UserManager():
             if self.get_user_role(_user_id) == 'superuser':
                 con = create_engine("postgresql:" + config.PostgreSQLDataAdapter_connection_string())
                 # users_data_list = data_store.get_rows({'where': f'users.doc_id in {tuple(_ids_list)}'})
-                users_data_list = pd.read_sql(f'select doc_id, name from users where doc_id in (SELECT unnest(ARRAY[{_ids_list}]))', con=con)
+                users_data_list = pd.read_sql(f'select * from users where doc_id in (SELECT unnest(ARRAY[{_ids_list}]))', con=con)
                 # for user_data in users_data_list:
                 #     users_list.append(self.user_row_to_user(user_data))
 

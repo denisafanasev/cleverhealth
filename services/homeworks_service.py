@@ -48,21 +48,27 @@ class HomeworksService():
         """
 
         education_stream_manager = EducationStreamManager()
-        user_manager = UserManager()
         course_manager = EducationCourseManager()
 
         education_stream = education_stream_manager.get_education_stream(_id_education_stream)
-        students_list = user_manager.get_users_by_ids_list(_current_user_id, education_stream.students_list)
-        if len(students_list) == 0:
-            for user_id in education_stream.students_list:
-                user = user_manager.get_user_by_id(user_id)
-                if user is not None:
-                    students_list.append(user)
-
-        education_stream.students_list = students_list
         education_stream.course = course_manager.get_course_by_id(education_stream.course)
 
         return education_stream
+
+    def get_users_by_education_streams(self, _users_id_list, _current_user_id):
+        """
+
+        """
+        user_manager = UserManager()
+
+        users_list = user_manager.get_users_by_ids_list(_current_user_id, _users_id_list)
+        if len(users_list) == 0:
+            for user_id in _users_id_list:
+                user = user_manager.get_user_by_id(user_id)
+                if user is not None:
+                    users_list.append(user)
+
+        return users_list
 
     def get_user_by_id(self, _id_user):
         """

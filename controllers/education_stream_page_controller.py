@@ -39,7 +39,7 @@ class EducationStreamPageController():
         else:
             
             students_df = students[['doc_id', 'login', 'name', 'email']]
-            students_df.rename(columns={'doci_id': 'id'})
+            students_df = students_df.rename(columns={'doc_id': 'id'})
             
             students_list = students_df.to_dict('records')
 
@@ -75,7 +75,7 @@ class EducationStreamPageController():
         
         else:
             curators_df = curators[['doc_id', 'login', 'name', 'email']]
-            curators_df.rename(columns={'doci_id': 'id'}, inplace=True)
+            curators_df = curators_df.rename(columns={'doc_id': 'id'})
             curators_list = curators_df.to_dict('records')
 
         return curators_list

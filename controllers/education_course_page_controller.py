@@ -6,13 +6,13 @@ class EducationCoursePageController():
     Сервис для страницы курса
     """    
 
-    def get_course_modules_list(self, _id, _user_id):
+    def get_course_modules_list(self, _id: int, _user_id: int) -> list:
         """
         Возвращает список модулей курса по id
 
         Args:
-            _id(Int): индентификатор курса
-            _user_id(Int): индентификатор пользователя
+            _id(Int): ID курса
+            _user_id(Int): ID пользователя
 
         Returns:
             modules_list_view(List): список модулей курса

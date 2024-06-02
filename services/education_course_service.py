@@ -63,7 +63,7 @@ class EducationCourseService():
         education_streams = education_stream_manager.get_education_streams_list_by_id_user(user.user_id, user.role)
 
         for education_stream in education_streams:
-            if education_stream.id_course == _course_id:
+            if education_stream.course == _course_id:
                 if education_stream.status != "закончен":
                     user.education_module_expiration_date = education_stream.date_end
 

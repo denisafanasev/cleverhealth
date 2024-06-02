@@ -175,7 +175,7 @@ class EducationHomeTasksPageController():
         homeworks_service = HomeworksService()
 
         education_streams_list = homeworks_service.get_educations_stream()
-        education_streams_list_view =[]
+        education_streams_list_view = []
         for education_stream in education_streams_list:
             education_stream_view = {
                 "id": education_stream.id,
@@ -201,6 +201,8 @@ class EducationHomeTasksPageController():
         homeworks_service = HomeworksService()
 
         education_stream = homeworks_service.get_education_stream(_id_education_stream, _current_user_id)
+        students_list = homeworks_service.get_users_by_education_streams(education_stream.students_list,
+                                                                         _current_user_id)
         education_stream_view = {
             'id': education_stream.id,
             'name': education_stream.name,
@@ -209,34 +211,31 @@ class EducationHomeTasksPageController():
         }
         lessons_list = homeworks_service.get_lessons_by_id_course(education_stream.course.id)
         id_lessons_list = set(lesson.id for lesson in lessons_list)
-        if not isinstance(education_stream.students_list, pd.DataFrame):
-            for user_data in education_stream.students_list:
-                user_view = {
-                    "user_id": user_data.user_id,
-                    'name': user_data.name
-                }
+        if not isinstance(students_list, pd.DataFrame):
+            for user_data in students_list:
+                user_view = {"user_id": user_data.user_id, 'name': user_data.name,
+                             'is_unread_message': homeworks_service.is_unread_messages(id_lessons_list,
+                                                                                       user_data.user_id),
+                             'amount_accepted_homeworks': homeworks_service.get_amount_accepted_homework(
+                                 user_data.user_id, id_lessons_list),
+                             'amount_no_accepted_homeworks': homeworks_service.get_amount_no_accepted_homework(
+                                 user_data.user_id, id_lessons_list)}
                 # проверяем есть ли непрочитанные сообщения у текущего пользователя и
                 # сколько принято/не принято домашних работ у пользователей потока
-                user_view['is_unread_message'] = homeworks_service.is_unread_messages(id_lessons_list, user_data.user_id)
 
-                user_view['amount_accepted_homeworks'] = homeworks_service.get_amount_accepted_homework(user_data.user_id, id_lessons_list)
-                user_view['amount_no_accepted_homeworks'] = homeworks_service.get_amount_no_accepted_homework(user_data.user_id, id_lessons_list)
                 education_stream_view['students_list'].append(user_view)
-                
-        else:
-            
-            users_df = education_stream.students_list[['doc_id', 'name']]
-            users_df.rename(columns={'doc_id': 'user_id'}, inplace=True)
-            
-            users_df['is_unread_message'] = users_df['user_id'].apply(lambda x: homeworks_service.is_unread_messages(id_lessons_list, x))
-            # for index, df in users_df.iterrows():
-            #     amount_accepted_homeworks, amount_no_accepted_homeworks = homeworks_service.get_amount_accepted_homework(df['user_id'], id_lessons_list)
-                
-            #     users_df.at[index, 'amount_accepted_homeworks'] = amount_accepted_homeworks
-            #     users_df.at[index, 'amount_no_accepted_homeworks'] = amount_no_accepted_homeworks
 
-            users_df['amount_accepted_homeworks'] = users_df['user_id'].apply(lambda x: homeworks_service.get_amount_accepted_homework(x, id_lessons_list))
-            users_df['amount_no_accepted_homeworks'] = users_df['user_id'].apply(lambda x: homeworks_service.get_amount_no_accepted_homework(x, id_lessons_list))
+        else:
+
+            users_df = students_list[['doc_id', 'name']]
+            users_df.rename(columns={'doc_id': 'user_id'}, inplace=True)
+
+            users_df['is_unread_message'] = users_df['user_id'].apply(
+                lambda x: homeworks_service.is_unread_messages(id_lessons_list, x))
+            users_df['amount_accepted_homeworks'] = users_df['user_id'].apply(
+                lambda x: homeworks_service.get_amount_accepted_homework(x, id_lessons_list))
+            users_df['amount_no_accepted_homeworks'] = users_df['user_id'].apply(
+                lambda x: homeworks_service.get_amount_no_accepted_homework(x, id_lessons_list))
             users_df = users_df.to_dict('records')
             education_stream_view['students_list'] = users_df
 
